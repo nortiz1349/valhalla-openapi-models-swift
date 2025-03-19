@@ -11,6 +11,7 @@ import Foundation
 #endif
 
 public struct RouteRequest: Codable, Hashable {
+    
     static let locationsRule = ArrayRule(minItems: 2, maxItems: nil, uniqueItems: false)
     /** An identifier to disambiguate requests (echoed by the server). */
     public var id: String?
@@ -20,16 +21,47 @@ public struct RouteRequest: Codable, Hashable {
     public var avoidLocations: [RoutingWaypoint]?
     /** One or multiple exterior rings of polygons in the form of nested JSON arrays. Roads intersecting these rings will be avoided during path finding. Open rings will be closed automatically. */
     public var avoidPolygons: [[[Double]]]?
-    public var directionsOptions: DirectionsOptions?
+    public var units: DistanceUnit?
+    public var language: ValhallaLanguages?
+    /** The level of directional narrative to include. Locations and times will always be returned, but narrative generation verbosity can be controlled with this parameter. */
+    public var directionsType: DirectionsOptions.DirectionsType? = .instructions
+    public var format: DirectionsOptions.Format?
+    public var shapeFormat: DirectionsOptions.ShapeFormat? = .polyline6
+    public var bannerInstructions: Bool?
+    public var voiceInstructions: Bool?
+    public var alternates: Int?
+    
 
-    public init(id: String? = nil, locations: [RoutingWaypoint], costing: CostingModel, costingOptions: CostingOptions? = nil, avoidLocations: [RoutingWaypoint]? = nil, avoidPolygons: [[[Double]]]? = nil, directionsOptions: DirectionsOptions? = nil) {
+    public init(
+        id: String? = nil,
+        locations: [RoutingWaypoint],
+        costing: CostingModel,
+        costingOptions: CostingOptions? = nil,
+        avoidLocations: [RoutingWaypoint]? = nil,
+        avoidPolygons: [[[Double]]]? = nil,
+        units: DistanceUnit? = nil,
+        language: ValhallaLanguages? = nil,
+        directionsType: DirectionsOptions.DirectionsType? = .instructions,
+        format: DirectionsOptions.Format? = nil,
+        shapeFormat: DirectionsOptions.ShapeFormat? = .polyline6,
+        bannerInstructions: Bool? = nil,
+        voiceInstructions: Bool? = nil,
+        alternates: Int? = nil
+    ) {
         self.id = id
         self.locations = locations
         self.costing = costing
         self.costingOptions = costingOptions
         self.avoidLocations = avoidLocations
         self.avoidPolygons = avoidPolygons
-        self.directionsOptions = directionsOptions
+        self.units = units
+        self.language = language
+        self.directionsType = directionsType
+        self.format = format
+        self.shapeFormat = shapeFormat
+        self.bannerInstructions = bannerInstructions
+        self.voiceInstructions = voiceInstructions
+        self.alternates = alternates
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -39,7 +71,14 @@ public struct RouteRequest: Codable, Hashable {
         case costingOptions = "costing_options"
         case avoidLocations = "avoid_locations"
         case avoidPolygons = "avoid_polygons"
-        case directionsOptions = "directions_options"
+        case units
+        case language
+        case directionsType = "directions_type"
+        case format
+        case shapeFormat = "shape_format"
+        case bannerInstructions = "banner_instructions"
+        case voiceInstructions = "voice_instructions"
+        case alternates
     }
 
     // Encodable protocol methods
@@ -52,6 +91,13 @@ public struct RouteRequest: Codable, Hashable {
         try container.encodeIfPresent(costingOptions, forKey: .costingOptions)
         try container.encodeIfPresent(avoidLocations, forKey: .avoidLocations)
         try container.encodeIfPresent(avoidPolygons, forKey: .avoidPolygons)
-        try container.encodeIfPresent(directionsOptions, forKey: .directionsOptions)
+        try container.encodeIfPresent(units, forKey: .units)
+        try container.encodeIfPresent(language, forKey: .language)
+        try container.encodeIfPresent(directionsType, forKey: .directionsType)
+        try container.encodeIfPresent(format, forKey: .format)
+        try container.encodeIfPresent(shapeFormat, forKey: .shapeFormat)
+        try container.encodeIfPresent(bannerInstructions, forKey: .bannerInstructions)
+        try container.encodeIfPresent(voiceInstructions, forKey: .voiceInstructions)
+        try container.encodeIfPresent(alternates, forKey: .alternates)
     }
 }
