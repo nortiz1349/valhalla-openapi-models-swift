@@ -23,14 +23,17 @@ public struct RouteSummary: Codable, Hashable {
     public var minLon: Double
     /** The maximum longitude of the bounding box containing the route. */
     public var maxLon: Double
+    /** The estimated travel time with cost options, in seconds */
+    public var cost: Double
 
-    public init(time: Double, length: Double, minLat: Double, maxLat: Double, minLon: Double, maxLon: Double) {
+    public init(time: Double, length: Double, minLat: Double, maxLat: Double, minLon: Double, maxLon: Double, cost: Double) {
         self.time = time
         self.length = length
         self.minLat = minLat
         self.maxLat = maxLat
         self.minLon = minLon
         self.maxLon = maxLon
+        self.cost = cost
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -40,6 +43,7 @@ public struct RouteSummary: Codable, Hashable {
         case maxLat = "max_lat"
         case minLon = "min_lon"
         case maxLon = "max_lon"
+        case cost
     }
 
     // Encodable protocol methods
@@ -52,5 +56,6 @@ public struct RouteSummary: Codable, Hashable {
         try container.encode(maxLat, forKey: .maxLat)
         try container.encode(minLon, forKey: .minLon)
         try container.encode(maxLon, forKey: .maxLon)
+        try container.encode(cost, forKey: .cost)
     }
 }
