@@ -7,7 +7,7 @@
 
 import Foundation
 #if canImport(AnyCodable)
-    import AnyCodable
+import AnyCodable
 #endif
 
 public struct RouteSummary: Codable, Hashable {
@@ -23,16 +23,19 @@ public struct RouteSummary: Codable, Hashable {
     public var minLon: Double
     /** The maximum longitude of the bounding box containing the route. */
     public var maxLon: Double
-
-    public init(time: Double, length: Double, minLat: Double, maxLat: Double, minLon: Double, maxLon: Double) {
+    /** The estimated travel time with cost options, in seconds */
+    public var cost: Double
+    
+    public init(time: Double, length: Double, minLat: Double, maxLat: Double, minLon: Double, maxLon: Double, cost: Double) {
         self.time = time
         self.length = length
         self.minLat = minLat
         self.maxLat = maxLat
         self.minLon = minLon
         self.maxLon = maxLon
+        self.cost = cost
     }
-
+    
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case time
         case length
@@ -40,10 +43,11 @@ public struct RouteSummary: Codable, Hashable {
         case maxLat = "max_lat"
         case minLon = "min_lon"
         case maxLon = "max_lon"
+        case cost
     }
-
+    
     // Encodable protocol methods
-
+    
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(time, forKey: .time)
@@ -52,5 +56,6 @@ public struct RouteSummary: Codable, Hashable {
         try container.encode(maxLat, forKey: .maxLat)
         try container.encode(minLon, forKey: .minLon)
         try container.encode(maxLon, forKey: .maxLon)
+        try container.encode(cost, forKey: .cost)
     }
 }
