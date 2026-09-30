@@ -22,22 +22,29 @@ public struct Mjolnir: Codable, Hashable {
     public var includeDriveways: Bool? = true
     public var includeDriving: Bool? = true
     public var includePedestrian: Bool? = true
-    public var logging: Logging?
+    public var includePlatforms: Bool? = true
+    public var keepAllOsmNodeIds: Bool? = false
+    public var keepOsmNodeIds: Bool? = false
+    public var landmarks: String? = "/custom_data/landmarks.sqlite"
     public var lruMemCacheHardControl: Bool? = false
     public var maxCacheSize: Int? = 1_000_000_000
     public var maxConcurrentReaderUsers: Int? = 1
+    public var pedestrianAreas: Bool? = false
     public var reclassifyLinks: Bool? = true
     public var shortcuts: Bool? = true
     public var tileDir: String? = ""
     public var tileExtract: String? = ""
+    public var tileUrl: String? = ""
+    public var tileUrlGz: Bool? = false
     public var timezone: String? = "timezones.sqlite"
     public var trafficExtract: String? = ""
     public var transitDir: String? = ""
     public var transitFeedsDir: String? = ""
+    public var transitPbfLimit: Int? = 20000
     public var useLruMemCache: Bool? = false
     public var useSimpleMemCache: Bool? = false
 
-    public init(admin: String? = "/custom_data/admins.sqlite", dataProcessing: MjolnirDataProcessing? = nil, globalSynchronizedCache: Bool? = false, hierarchy: Bool? = true, idTableSize: Int? = 1_300_000_000, importBikeShareStations: Bool? = false, includeBicycle: Bool? = true, includeConstruction: Bool? = false, includeDriveways: Bool? = true, includeDriving: Bool? = true, includePedestrian: Bool? = true, logging: Logging? = nil, lruMemCacheHardControl: Bool? = false, maxCacheSize: Int? = 1_000_000_000, maxConcurrentReaderUsers: Int? = 1, reclassifyLinks: Bool? = true, shortcuts: Bool? = true, tileDir: String? = "", tileExtract: String? = "", timezone: String? = "timezones.sqlite", trafficExtract: String? = "", transitDir: String? = "", transitFeedsDir: String? = "", useLruMemCache: Bool? = false, useSimpleMemCache: Bool? = false) {
+    public init(admin: String? = "/custom_data/admins.sqlite", dataProcessing: MjolnirDataProcessing? = nil, globalSynchronizedCache: Bool? = false, hierarchy: Bool? = true, idTableSize: Int? = 1_300_000_000, importBikeShareStations: Bool? = false, includeBicycle: Bool? = true, includeConstruction: Bool? = false, includeDriveways: Bool? = true, includeDriving: Bool? = true, includePedestrian: Bool? = true, includePlatforms: Bool? = true, keepAllOsmNodeIds: Bool? = false, keepOsmNodeIds: Bool? = false, landmarks: String? = "/custom_data/landmarks.sqlite", lruMemCacheHardControl: Bool? = false, maxCacheSize: Int? = 1_000_000_000, maxConcurrentReaderUsers: Int? = 1, pedestrianAreas: Bool? = false, reclassifyLinks: Bool? = true, shortcuts: Bool? = true, tileDir: String? = "", tileExtract: String? = "", tileUrl: String? = "", tileUrlGz: Bool? = false, timezone: String? = "timezones.sqlite", trafficExtract: String? = "", transitDir: String? = "", transitFeedsDir: String? = "", transitPbfLimit: Int? = 20000, useLruMemCache: Bool? = false, useSimpleMemCache: Bool? = false) {
         self.admin = admin
         self.dataProcessing = dataProcessing
         self.globalSynchronizedCache = globalSynchronizedCache
@@ -49,18 +56,25 @@ public struct Mjolnir: Codable, Hashable {
         self.includeDriveways = includeDriveways
         self.includeDriving = includeDriving
         self.includePedestrian = includePedestrian
-        self.logging = logging
+        self.includePlatforms = includePlatforms
+        self.keepAllOsmNodeIds = keepAllOsmNodeIds
+        self.keepOsmNodeIds = keepOsmNodeIds
+        self.landmarks = landmarks
         self.lruMemCacheHardControl = lruMemCacheHardControl
         self.maxCacheSize = maxCacheSize
         self.maxConcurrentReaderUsers = maxConcurrentReaderUsers
+        self.pedestrianAreas = pedestrianAreas
         self.reclassifyLinks = reclassifyLinks
         self.shortcuts = shortcuts
         self.tileDir = tileDir
         self.tileExtract = tileExtract
+        self.tileUrl = tileUrl
+        self.tileUrlGz = tileUrlGz
         self.timezone = timezone
         self.trafficExtract = trafficExtract
         self.transitDir = transitDir
         self.transitFeedsDir = transitFeedsDir
+        self.transitPbfLimit = transitPbfLimit
         self.useLruMemCache = useLruMemCache
         self.useSimpleMemCache = useSimpleMemCache
     }
@@ -77,18 +91,25 @@ public struct Mjolnir: Codable, Hashable {
         case includeDriveways = "include_driveways"
         case includeDriving = "include_driving"
         case includePedestrian = "include_pedestrian"
-        case logging
+        case includePlatforms = "include_platforms"
+        case keepAllOsmNodeIds = "keep_all_osm_node_ids"
+        case keepOsmNodeIds = "keep_osm_node_ids"
+        case landmarks
         case lruMemCacheHardControl = "lru_mem_cache_hard_control"
         case maxCacheSize = "max_cache_size"
         case maxConcurrentReaderUsers = "max_concurrent_reader_users"
+        case pedestrianAreas = "pedestrian_areas"
         case reclassifyLinks = "reclassify_links"
         case shortcuts
         case tileDir = "tile_dir"
         case tileExtract = "tile_extract"
+        case tileUrl = "tile_url"
+        case tileUrlGz = "tile_url_gz"
         case timezone
         case trafficExtract = "traffic_extract"
         case transitDir = "transit_dir"
         case transitFeedsDir = "transit_feeds_dir"
+        case transitPbfLimit = "transit_pbf_limit"
         case useLruMemCache = "use_lru_mem_cache"
         case useSimpleMemCache = "use_simple_mem_cache"
     }
@@ -108,18 +129,25 @@ public struct Mjolnir: Codable, Hashable {
         try container.encodeIfPresent(includeDriveways, forKey: .includeDriveways)
         try container.encodeIfPresent(includeDriving, forKey: .includeDriving)
         try container.encodeIfPresent(includePedestrian, forKey: .includePedestrian)
-        try container.encodeIfPresent(logging, forKey: .logging)
+        try container.encodeIfPresent(includePlatforms, forKey: .includePlatforms)
+        try container.encodeIfPresent(keepAllOsmNodeIds, forKey: .keepAllOsmNodeIds)
+        try container.encodeIfPresent(keepOsmNodeIds, forKey: .keepOsmNodeIds)
+        try container.encodeIfPresent(landmarks, forKey: .landmarks)
         try container.encodeIfPresent(lruMemCacheHardControl, forKey: .lruMemCacheHardControl)
         try container.encodeIfPresent(maxCacheSize, forKey: .maxCacheSize)
         try container.encodeIfPresent(maxConcurrentReaderUsers, forKey: .maxConcurrentReaderUsers)
+        try container.encodeIfPresent(pedestrianAreas, forKey: .pedestrianAreas)
         try container.encodeIfPresent(reclassifyLinks, forKey: .reclassifyLinks)
         try container.encodeIfPresent(shortcuts, forKey: .shortcuts)
         try container.encodeIfPresent(tileDir, forKey: .tileDir)
         try container.encodeIfPresent(tileExtract, forKey: .tileExtract)
+        try container.encodeIfPresent(tileUrl, forKey: .tileUrl)
+        try container.encodeIfPresent(tileUrlGz, forKey: .tileUrlGz)
         try container.encodeIfPresent(timezone, forKey: .timezone)
         try container.encodeIfPresent(trafficExtract, forKey: .trafficExtract)
         try container.encodeIfPresent(transitDir, forKey: .transitDir)
         try container.encodeIfPresent(transitFeedsDir, forKey: .transitFeedsDir)
+        try container.encodeIfPresent(transitPbfLimit, forKey: .transitPbfLimit)
         try container.encodeIfPresent(useLruMemCache, forKey: .useLruMemCache)
         try container.encodeIfPresent(useSimpleMemCache, forKey: .useSimpleMemCache)
     }

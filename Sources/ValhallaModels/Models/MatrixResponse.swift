@@ -11,21 +11,21 @@ import Foundation
 #endif
 
 public struct MatrixResponse: Codable, Hashable {
-    static let sourcesRule = ArrayRule(minItems: 1, maxItems: nil, uniqueItems: false)
-    static let targetsRule = ArrayRule(minItems: 1, maxItems: nil, uniqueItems: false)
-    static let sourcesToTargetsRule = ArrayRule(minItems: 1, maxItems: nil, uniqueItems: false)
+    public static let sourcesRule = ArrayRule(minItems: 1, maxItems: nil, uniqueItems: false)
+    public static let targetsRule = ArrayRule(minItems: 1, maxItems: nil, uniqueItems: false)
+    public static let sourcesToTargetsRule = ArrayRule(minItems: 1, maxItems: nil, uniqueItems: false)
     /** An identifier to disambiguate requests (echoed by the server). */
     public var id: String?
-    /** The list of starting locations */
-    public var sources: [[Coordinate]]
-    /** The list of ending locations */
-    public var targets: [[Coordinate]]
+    /** The list of starting locations, echoed back flat and in request order. */
+    public var sources: [Coordinate]
+    /** The list of ending locations, echoed back flat and in request order. */
+    public var targets: [Coordinate]
     /** The matrix of starting and ending locations, along with the computed distance and travel time. The array is row-ordered. This means that the time and distance from the first location to all others forms the first row of the array, followed by the time and distance from the second source location to all target locations, etc. */
     public var sourcesToTargets: [[MatrixDistance]]
     public var warnings: [Warning]?
     public var units: ValhallaLongUnits
 
-    public init(id: String? = nil, sources: [[Coordinate]], targets: [[Coordinate]], sourcesToTargets: [[MatrixDistance]], warnings: [Warning]? = nil, units: ValhallaLongUnits) {
+    public init(id: String? = nil, sources: [Coordinate], targets: [Coordinate], sourcesToTargets: [[MatrixDistance]], warnings: [Warning]? = nil, units: ValhallaLongUnits) {
         self.id = id
         self.sources = sources
         self.targets = targets
@@ -55,3 +55,6 @@ public struct MatrixResponse: Codable, Hashable {
         try container.encode(units, forKey: .units)
     }
 }
+
+@available(iOS 13, tvOS 13, watchOS 6, macOS 10.15, *)
+extension MatrixResponse: Identifiable {}

@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# Check that required tools are installed
+if ! command -v openapi-generator >/dev/null 2>&1; then
+    echo "Error: openapi-generator is not installed or not on your PATH."
+    echo "Install it with: brew install openapi-generator"
+    echo "See https://openapi-generator.tech/docs/installation for other options."
+    exit 1
+fi
+
+if ! command -v swiftformat >/dev/null 2>&1; then
+    echo "Error: swiftformat is not installed or not on your PATH."
+    echo "Install it with: brew install swiftformat"
+    exit 1
+fi
+
 # Define the source directories
 source_dirs=("Sources/ValhallaModels" "Sources/ValhallaConfigModels")
 
@@ -40,6 +54,21 @@ for dir in "${source_dirs[@]}"; do
 
     echo "Done generating models for $dir"
 done
+
+# The swift5 generator ignores `nullable` on array items, and Valhalla returns
+# null for a point with no height data, so patch the two height arrays by hand.
+height_model=Sources/ValhallaModels/Models/HeightResponse.swift
+sed -i.bak \
+    -e 's/height: \[Double\]?/height: [Double?]?/g' \
+    -e 's/rangeHeight: \[\[Double\]\]?/rangeHeight: [[Double?]]?/g' \
+    "$height_model"
+rm "$height_model.bak"
+
+if ! grep -q 'height: \[Double?\]?' "$height_model" ||
+   ! grep -q 'rangeHeight: \[\[Double?\]\]?' "$height_model"; then
+    echo "Error: the height nullability patch did not apply to $height_model"
+    exit 1
+fi
 
 # Clean up temporary directory
 rm -rf .openapi-temp
